@@ -9,11 +9,13 @@ public class IoTNode extends Node{
 	
 	private int interval;
 	private ArrayList<FogNode> neighborFogNodes = new ArrayList<FogNode>();
+	private int sequenceNum; 
 	
 	private IoTNode(String ipAddress, int tcpPort, int udpPort, int interval, ArrayList<FogNode> fogNodeList) {
 		super(ipAddress, tcpPort, udpPort);
 		this.interval = interval;
 		this.neighborFogNodes = fogNodeList;
+		this.sequenceNum = getRandomIntegerBetweenRange(0,Integer.MAX_VALUE);
 		
 		//start listener to listen on any responses from fog/cloud nodes.
 		listenForResponse();
@@ -30,10 +32,14 @@ public class IoTNode extends Node{
 	public Request prepareRequest() {
 		int randomIndex = getRandomIntegerBetweenRange(0, neighborFogNodes.size()-1);
 		FogNode destinationNode = getNeighborFogNodes().get(randomIndex);
-		//TO-DO: generate seq no.
+		int seqNum = getSequenceNum();
+		if(seqNum == Integer.MAX_VALUE)
+			seqNum = 0;
+		else 
+			seqNum++;
+		setSequenceNum(seqNum);
 		RequestHeader header = new RequestHeader(getIpAddress(), getUdpPort(),getIpAddress(), getUdpPort(), destinationNode.getIpAddress(), destinationNode.getUdpPort(), 
-				"UDP", getRandomIntegerBetweenRange(0,Integer.MAX_VALUE), 
-				getRandomIntegerBetweenRange(2,5), getRandomIntegerBetweenRange(3,7));
+				"UDP", seqNum, getRandomIntegerBetweenRange(2,5), getRandomIntegerBetweenRange(3,7));
 		Request request = new Request(header, "["+header.getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ":"+ getUdpPort()+": Request has been generated and being sent to "+destinationNode.getIpAddress()+": "+destinationNode.getUdpPort());
 		return request;
 	}
@@ -98,5 +104,13 @@ public class IoTNode extends Node{
 
 	public void setInterval(int interval) {
 		this.interval = interval;
+	}
+
+	public int getSequenceNum() {
+		return sequenceNum;
+	}
+
+	public void setSequenceNum(int sequenceNum) {
+		this.sequenceNum = sequenceNum;
 	}
 }

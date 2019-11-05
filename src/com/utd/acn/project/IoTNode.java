@@ -1,10 +1,5 @@
 package com.utd.acn.project;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,7 +16,6 @@ public class IoTNode extends Node{
 		this.neighborFogNodes = fogNodeList;
 		
 		//start listener to listen on any responses from fog/cloud nodes.
-		//udpSocket = new DatagramSocket(udpPort);
 		listenForResponse();
 		
 		//scheduler to keep generating requests periodically.
@@ -37,8 +31,9 @@ public class IoTNode extends Node{
 		int randomIndex = getRandomIntegerBetweenRange(0, neighborFogNodes.size()-1);
 		FogNode destinationNode = getNeighborFogNodes().get(randomIndex);
 		//TO-DO: generate seq no.
-		RequestHeader header = new RequestHeader(getIpAddress(), getUdpPort(), destinationNode.getIpAddress(), destinationNode.getUdpPort(), 
-				"UDP", getRandomIntegerBetweenRange(0,Integer.MAX_VALUE), 2, 3);
+		RequestHeader header = new RequestHeader(getIpAddress(), getUdpPort(),getIpAddress(), getUdpPort(), destinationNode.getIpAddress(), destinationNode.getUdpPort(), 
+				"UDP", getRandomIntegerBetweenRange(0,Integer.MAX_VALUE), 
+				getRandomIntegerBetweenRange(2,5), getRandomIntegerBetweenRange(3,7));
 		Request request = new Request(header, "["+header.getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ":"+ getUdpPort()+": Request has been generated and being sent to "+destinationNode.getIpAddress()+": "+destinationNode.getUdpPort());
 		return request;
 	}
@@ -46,21 +41,6 @@ public class IoTNode extends Node{
 	public void sendRequest() {
 		Request request = prepareRequest();
 		send(request, request.getHeader().getDestinationIP(), request.getHeader().getDestinationPort(), "UDP");
-//		try{
-//			DatagramSocket socket = new DatagramSocket();
-//			InetAddress IPAddress = InetAddress.getByName(request.getHeader().getDestinationIP());
-//			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//			ObjectOutputStream os = new ObjectOutputStream(outputStream);
-//			os.writeObject(request);
-//			byte[] data = outputStream.toByteArray();
-//			DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, request.getHeader().getDestinationPort());
-//			socket.send(sendPacket);
-//			//System.out.println("Request sent to: "+request.getHeader().getDestinationPort());
-//			os.close();
-//			socket.close();
-//		}catch(Exception e){
-//			System.out.println(e);
-//		}
 	}
 	
 	public void listenForResponse() {
@@ -71,6 +51,7 @@ public class IoTNode extends Node{
 	public void printResponse(Response response) {
 		response.appendAuditTrail("["+response.getHeader().getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ":"+ getUdpPort()+": Response has been received.");
 		System.out.println(response.getAuditTrail());
+		System.out.println();
 	}
 	
 	public static void main(String args[]) {
@@ -78,7 +59,6 @@ public class IoTNode extends Node{
 		//String cmd = "3 9882 127.0.0.1 9876 127.0.0.1 9879";
 		//args = cmd.split(" ");
 		
-		IoTNode iotNode = null;
 		int interval;
 		int udpPort;
 		if(args.length > 0) {
@@ -89,7 +69,7 @@ public class IoTNode extends Node{
 				FogNode n = new FogNode(args[i], 0, Integer.parseInt(args[++i]));
 				tempFogNodeList.add(n);
 			}
-			iotNode = new IoTNode("127.0.0.1", 0, udpPort, interval, tempFogNodeList);
+			new IoTNode("127.0.0.1", 0, udpPort, interval, tempFogNodeList);
 		} else {
 			System.out.println("Improper arguments passed!");
 		}

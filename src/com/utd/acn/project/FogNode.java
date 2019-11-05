@@ -1,13 +1,5 @@
 package com.utd.acn.project;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Queue;
@@ -18,14 +10,14 @@ import java.util.concurrent.TimeUnit;
 
 public class FogNode extends Node {
 
-	private double maxResponseTime;
+	private int maxResponseTime;
 	private int interval;
 	private CloudNode cloudNode;
 	private Queue<Request> processingQueue = new ConcurrentLinkedQueue<Request>();
 	private ArrayList<FogNode> neighborFogNodes = new ArrayList<FogNode>();
-	private double currExpectedDelay;
+	private int currExpectedDelay;
 	
-	private FogNode(String ipAddress, int tcpPort, int udpPort, int interval, double maxResponseTime, CloudNode cloudNode, ArrayList<FogNode> fogNodeList) {
+	private FogNode(String ipAddress, int tcpPort, int udpPort, int interval, int maxResponseTime, CloudNode cloudNode, ArrayList<FogNode> fogNodeList) {
 		super(ipAddress, tcpPort, udpPort);
 		this.interval = interval;
 		this.maxResponseTime = maxResponseTime;
@@ -61,11 +53,11 @@ public class FogNode extends Node {
 		tcpListener.start();
 	}
 
-	public void processRequest(Request request) {
+	protected void processRequest(Request request) {
 		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress() + ":"+getUdpPort()+": Request has been received.");
 		int currForwardingLt = request.getHeader().getForwardingLimit();
 		request.getHeader().setForwardingLimit(currForwardingLt-1);
-		double expectedDelay = request.getHeader().getProcessingTime();
+		int expectedDelay = request.getHeader().getProcessingTime();
 		Iterator<Request> itr = getProcessingQueue().iterator();
 		while (itr.hasNext()) 
 		{
@@ -89,44 +81,22 @@ public class FogNode extends Node {
 			forwardRequestToCloud(request);
 		else {
 			appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress() + ":"+ getTcpPort()+": Forwarding request to neighboring fog node :"+ bestNode.getIpAddress()+":"+bestNode.getTcpPort());
+			request.getHeader().setPrevNodeIP(getIpAddress());
+			request.getHeader().setPrevNodePort(getTcpPort());
 			send(request, bestNode.getIpAddress(), bestNode.getTcpPort(), "TCP");
-//			try{
-//				Socket s = new Socket(bestNode.getIpAddress(), bestNode.getTcpPort());
-//				OutputStream os = s.getOutputStream();
-//				ObjectOutputStream oos = new ObjectOutputStream(os);
-//				oos.writeObject(request);
-//				//oos.writeObject(new String("forwarding to neighboring fog node: "+ bestNode.getIpAddress()));
-//				oos.close();
-//				os.close();
-//				s.close();
-//			}catch(Exception e){
-//				System.out.println(e);
-//				System.out.println("Error connecting to fog node. Hence forwarding request to cloud.");
-//				forwardRequestToCloud(request);
-//			}
 		}
 		
 	}
 	
 	private void forwardRequestToCloud(Request request) {
 		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+  getIpAddress() + ":"+ getTcpPort()+": Forwarding request to cloud node "+  getCloudNode().getIpAddress()+":"+ getCloudNode().getTcpPort());
+		request.getHeader().setPrevNodeIP(getIpAddress());
+		request.getHeader().setPrevNodePort(getTcpPort());
 		send(request, getCloudNode().getIpAddress(),getCloudNode().getTcpPort(), "TCP");
-//		try{
-//			Socket s = new Socket(getCloudNode().getIpAddress(),getCloudNode().getTcpPort());
-//			OutputStream os = s.getOutputStream();
-//			ObjectOutputStream oos = new ObjectOutputStream(os);
-//			oos.writeObject(request);
-//			//oos.writeObject(new String("another object from the client"));
-//			oos.close();
-//			os.close();
-//			s.close();
-//		}catch(Exception e){
-//			System.out.println(e);
-//		}
 	}
 	
-	public void updateNeighbors() {
-		double currExpectedDelay = 0;
+	protected void updateNeighbors() {
+		int currExpectedDelay = 0;
 		for(Request req : getProcessingQueue()) {
 			currExpectedDelay += req.getHeader().getProcessingTime();
 		}
@@ -135,22 +105,10 @@ public class FogNode extends Node {
 					neighbor.getIpAddress(), neighbor.getTcpPort(), "TCP");
 			FogNodeUpdatePacket updatePacket = new FogNodeUpdatePacket(header, currExpectedDelay);
 			send(updatePacket, header.getDestinationIP(), header.getDestinationPort(), "TCP");
-//			try {
-//				Socket s = new Socket(header.getDestinationIP(), header.getDestinationPort());
-//				OutputStream os = s.getOutputStream();
-//				ObjectOutputStream oos = new ObjectOutputStream(os);
-//				oos.writeObject(updatePacket);
-//				//oos.writeObject(new String("sending fog node update packet to :"+header.getDestinationIP()));
-//				oos.close();
-//				os.close();
-//				s.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
 		}
 	}
 	
-	public void storeNeighborsInfo(FogNodeUpdatePacket updatePacket) {
+	protected void storeNeighborsInfo(FogNodeUpdatePacket updatePacket) {
 		for(FogNode neighbor : getNeighborFogNodes()) { 
 			if(neighbor.getIpAddress().equals(updatePacket.getHeader().getSourceIP())) {
 				neighbor.setCurrExpectedDelay(updatePacket.getCurrExpectedDelay());
@@ -162,7 +120,8 @@ public class FogNode extends Node {
 	private FogNode getBestNeighbor(Request request) {
 		FogNode minDelayNeighbor = null;
 		for(FogNode neighbor : getNeighborFogNodes()) {
-			if(!request.getAuditTrail().contains(neighbor.getTcpPort()+"")) {
+			if(request.getHeader().getPrevNodeIP() != neighbor.getIpAddress() 
+					&& request.getHeader().getPrevNodePort() != neighbor.getTcpPort()) {
 				if(minDelayNeighbor == null)
 					minDelayNeighbor = neighbor;
 				else if(minDelayNeighbor.getCurrExpectedDelay() > neighbor.getCurrExpectedDelay())
@@ -180,24 +139,9 @@ public class FogNode extends Node {
 		return response;
 	}
 	
-	public void sendResponse(Request request) {
+	protected void sendResponse(Request request) {
 		Response response = prepareResponse(request);
 		send(response, response.getHeader().getSourceIP(), response.getHeader().getSourcePort(), "UDP");
-//		try{
-//			DatagramSocket socket = new DatagramSocket();
-//			InetAddress IPAddress = InetAddress.getByName(response.getHeader().getSourceIP());
-//			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//			ObjectOutputStream os = new ObjectOutputStream(outputStream);
-//			os.writeObject(response);
-//			byte[] data = outputStream.toByteArray();
-//			DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, response.getHeader().getSourcePort());
-//			socket.send(sendPacket);
-//			//System.out.println("Response sent to " + response.getHeader().getSourceIP()+": "+response.getHeader().getSourcePort());
-//			os.close();
-//			socket.close();
-//		}catch(Exception e){
-//			System.out.println(e);
-//		}
 	}
 	
 	public static void main(String args[]) {
@@ -210,13 +154,13 @@ public class FogNode extends Node {
 		//String TCP6 = "4 3 5330 9881 127.0.0.1 5331 127.0.0.1 5327 127.0.0.1 5329";
 		
 		//args = cmd.split(" ");
-		  double maxResponseTime; 
+		  int maxResponseTime; 
 		  int interval; 
 		  int tcpPort;
 		  int udpPort; 
 		  if(args.length > 0) 
 		  { 
-			  maxResponseTime = Double.parseDouble(args[0]); 
+			  maxResponseTime = Integer.parseInt(args[0]); 
 			  interval = Integer.parseInt(args[1]); 
 			  tcpPort = Integer.parseInt(args[2]); 
 			  udpPort = Integer.parseInt(args[3]); 
@@ -232,11 +176,11 @@ public class FogNode extends Node {
 		  }
 	}
 	
-	public double getMaxResponseTime() {
+	public int getMaxResponseTime() {
 		return maxResponseTime;
 	}
 
-	public void setMaxResponseTime(double maxResponseTime) {
+	public void setMaxResponseTime(int maxResponseTime) {
 		this.maxResponseTime = maxResponseTime;
 	}
 
@@ -280,11 +224,11 @@ public class FogNode extends Node {
 		this.neighborFogNodes.add(neighborFogNode);
 	}
 
-	public double getCurrExpectedDelay() {
+	public int getCurrExpectedDelay() {
 		return currExpectedDelay;
 	}
 
-	public void setCurrExpectedDelay(double currExpectedDelay) {
+	public void setCurrExpectedDelay(int currExpectedDelay) {
 		this.currExpectedDelay = currExpectedDelay;
 	}
 }

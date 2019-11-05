@@ -40,7 +40,6 @@ public class FogNodeTCPListener extends Thread{
 					Request request = (Request) obj;
 					fogNode.processRequest(request);
 				}
-                
             } catch (IOException | ClassNotFoundException e) { 
             	// closing resources TO-DO: Finally
                 try {

@@ -34,7 +34,6 @@ public class FogNodeUDPListener extends Thread {
             	ByteArrayInputStream baos = new ByteArrayInputStream(data);
                 ObjectInputStream oos = new ObjectInputStream(baos);
                 Request requestObj = (Request)oos.readObject();
-                //System.out.println("Request received at: "+requestObj.getHeader().getDestinationPort());
                 fogNode.processRequest(requestObj);
             } catch (IOException | ClassNotFoundException e) { 
             	udpSocket.close(); 

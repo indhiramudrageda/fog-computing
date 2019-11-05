@@ -11,5 +11,4 @@ public class UpdateNeighborsScheduler implements Runnable {
 	@Override public void run() { 
 		fogNode.updateNeighbors();
 	}
-
 }

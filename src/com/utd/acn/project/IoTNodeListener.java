@@ -34,7 +34,6 @@ public class IoTNodeListener extends Thread {
             	ByteArrayInputStream baos = new ByteArrayInputStream(data);
                 ObjectInputStream oos = new ObjectInputStream(baos);
                 Response responseObj = (Response)oos.readObject();
-                if(responseObj != null)System.out.println("Response obj received:"+ responseObj.getAuditTrail());
                 iotNode.printResponse(responseObj);
             } catch (IOException | ClassNotFoundException e) { 
             	this.udpSocket.close(); 

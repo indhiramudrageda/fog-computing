@@ -29,7 +29,7 @@ public class IoTNode extends Node{
 		super(ipAddress, tcpPort, udpPort);
 	}
 	
-	public Request prepareRequest() {
+	private Request prepareRequest() {
 		int randomIndex = getRandomIntegerBetweenRange(0, neighborFogNodes.size()-1);
 		FogNode destinationNode = getNeighborFogNodes().get(randomIndex);
 		int seqNum = getSequenceNum();
@@ -44,17 +44,17 @@ public class IoTNode extends Node{
 		return request;
 	}
 	
-	public void sendRequest() {
+	protected void sendRequest() {
 		Request request = prepareRequest();
 		send(request, request.getHeader().getDestinationIP(), request.getHeader().getDestinationPort(), "UDP");
 	}
 	
-	public void listenForResponse() {
+	private void listenForResponse() {
 		IoTNodeListener listener = new IoTNodeListener(this);
 		listener.start();
 	}
 
-	public void printResponse(Response response) {
+	protected void printResponse(Response response) {
 		response.appendAuditTrail("["+response.getHeader().getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ":"+ getUdpPort()+": Response has been received.");
 		System.out.println(response.getAuditTrail());
 		System.out.println();

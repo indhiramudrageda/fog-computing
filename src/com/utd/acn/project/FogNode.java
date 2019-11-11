@@ -81,8 +81,8 @@ public class FogNode extends Node {
 			forwardRequestToCloud(request);
 		else {
 			appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress() + ":"+ getTcpPort()+": Forwarding request to neighboring fog node :"+ bestNode.getIpAddress()+":"+bestNode.getTcpPort());
-			request.getHeader().setPrevNodeIP(getIpAddress());
-			request.getHeader().setPrevNodePort(getTcpPort());
+			request.getHeader().setComingFromIP(getIpAddress());
+			request.getHeader().setComingFromPort(getTcpPort());
 			send(request, bestNode.getIpAddress(), bestNode.getTcpPort(), "TCP");
 		}
 		
@@ -90,8 +90,8 @@ public class FogNode extends Node {
 	
 	private void forwardRequestToCloud(Request request) {
 		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+  getIpAddress() + ":"+ getTcpPort()+": Forwarding request to cloud node "+  getCloudNode().getIpAddress()+":"+ getCloudNode().getTcpPort());
-		request.getHeader().setPrevNodeIP(getIpAddress());
-		request.getHeader().setPrevNodePort(getTcpPort());
+		request.getHeader().setComingFromIP(getIpAddress());
+		request.getHeader().setComingFromPort(getTcpPort());
 		send(request, getCloudNode().getIpAddress(),getCloudNode().getTcpPort(), "TCP");
 	}
 	
@@ -120,8 +120,8 @@ public class FogNode extends Node {
 	private FogNode getBestNeighbor(Request request) {
 		FogNode minDelayNeighbor = null;
 		for(FogNode neighbor : getNeighborFogNodes()) {
-			if(request.getHeader().getPrevNodeIP() != neighbor.getIpAddress() 
-					&& request.getHeader().getPrevNodePort() != neighbor.getTcpPort()) {
+			if(request.getHeader().getComingFromIP() != neighbor.getIpAddress() 
+					&& request.getHeader().getComingFromPort()!= neighbor.getTcpPort()) {
 				if(minDelayNeighbor == null)
 					minDelayNeighbor = neighbor;
 				else if(minDelayNeighbor.getCurrExpectedDelay() > neighbor.getCurrExpectedDelay())

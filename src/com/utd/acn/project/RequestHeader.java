@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class RequestHeader implements Serializable{
 	private static final long serialVersionUID = 1L;
-	private String prevNodeIP;
-	private int prevNodePort;
+	private String comingFromIP;
+	private int comingFromPort;
 	private String sourceIP;
 	private int sourcePort;
 	private String destinationIP;
@@ -15,9 +15,9 @@ public class RequestHeader implements Serializable{
 	private int forwardingLimit;
 	private int processingTime;
 	
-	public RequestHeader(String prevNodeIP, int prevNodePort, String sourceIP, int sPort, String destinationIP, int dPort, String protocol, int seqNum, int forwardLt, int processingTime) {
-		this.prevNodeIP = prevNodeIP;
-		this.prevNodePort = prevNodePort;
+	public RequestHeader(String comingFromIP, int comingFromPort, String sourceIP, int sPort, String destinationIP, int dPort, String protocol, int seqNum, int forwardLt, int processingTime) {
+		this.comingFromIP = comingFromIP;
+		this.comingFromPort = comingFromPort;
 		this.sourceIP = sourceIP;
 		this.sourcePort = sPort;
 		this.destinationIP = destinationIP;
@@ -27,17 +27,21 @@ public class RequestHeader implements Serializable{
 		this.forwardingLimit = forwardLt;
 		this.processingTime = processingTime;
 	}
-	public String getPrevNodeIP() {
-		return prevNodeIP;
+	
+	public String getComingFromIP() {
+		return comingFromIP;
 	}
-	public void setPrevNodeIP(String prevNodeIP) {
-		this.prevNodeIP = prevNodeIP;
+
+	public void setComingFromIP(String comingFromIP) {
+		this.comingFromIP = comingFromIP;
 	}
-	public int getPrevNodePort() {
-		return prevNodePort;
+
+	public int getComingFromPort() {
+		return comingFromPort;
 	}
-	public void setPrevNodePort(int prevNodePort) {
-		this.prevNodePort = prevNodePort;
+
+	public void setComingFromPort(int comingFromPort) {
+		this.comingFromPort = comingFromPort;
 	}
 	public String getSourceIP() {
 		return sourceIP;

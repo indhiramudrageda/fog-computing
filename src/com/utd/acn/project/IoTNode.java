@@ -1,5 +1,7 @@
 package com.utd.acn.project;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,7 +62,7 @@ public class IoTNode extends Node{
 		System.out.println();
 	}
 	
-	public static void main(String args[]) {
+	public static void main(String args[]) throws UnknownHostException {
 		//java IoTNode interval MY_UDP IP1 UDP1 IP2 UDP2
 		//String cmd = "3 9882 127.0.0.1 9876 127.0.0.1 9879";
 		//args = cmd.split(" ");
@@ -75,7 +77,8 @@ public class IoTNode extends Node{
 				FogNode n = new FogNode(args[i], 0, Integer.parseInt(args[++i]));
 				tempFogNodeList.add(n);
 			}
-			new IoTNode("127.0.0.1", 0, udpPort, interval, tempFogNodeList);
+			InetAddress inetAddress = InetAddress.getLocalHost();
+			new IoTNode(inetAddress.getHostAddress(), 0, udpPort, interval, tempFogNodeList);
 		} else {
 			System.out.println("Improper arguments passed!");
 		}

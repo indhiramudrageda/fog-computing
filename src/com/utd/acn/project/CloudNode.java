@@ -1,5 +1,7 @@
 package com.utd.acn.project;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -50,16 +52,15 @@ public class CloudNode extends Node{
 		this.processingQueue = processingQueue;
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws UnknownHostException {
 		//java CloudNode MY_TCP
 		//java CloudNode 127.0.0.1 5331
 		
-		String ipAddress;
 		int tcpPort;
 		if(args.length > 0) {
-			ipAddress = args[0];
-			tcpPort = Integer.parseInt(args[1]);
-			CloudNode c = new CloudNode(ipAddress, tcpPort, 0);
+			tcpPort = Integer.parseInt(args[0]);
+			InetAddress inetAddress = InetAddress.getLocalHost();
+			CloudNode c = new CloudNode(inetAddress.getHostAddress(), tcpPort, 0);
 			c.intitializeListeners();
 		} else {
 			System.out.println("Improper arguments passed!");

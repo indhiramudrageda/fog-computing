@@ -1,5 +1,7 @@
 package com.utd.acn.project;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Queue;
@@ -144,7 +146,7 @@ public class FogNode extends Node {
 		send(response, response.getHeader().getSourceIP(), response.getHeader().getSourcePort(), "UDP");
 	}
 	
-	public static void main(String args[]) {
+	public static void main(String args[]) throws UnknownHostException {
 		//java Max_Response_Time t MY_TCP MY_UDP C TCP0 N1 TCP1 N2 TCP2
 		//String TCP1 = "4 3 5325 9876 127.0.0.1 5331 127.0.0.1 5326 127.0.0.1 5328";
 		//String TCP2 = "4 3 5326 9877 127.0.0.1 5331 127.0.0.1 5325 127.0.0.1 5327 127.0.0.1 5328";
@@ -170,7 +172,8 @@ public class FogNode extends Node {
 				  FogNode n = new FogNode(args[i], Integer.parseInt(args[++i]), 0); 
 				  tempFogNodeList.add(n); 
 			  } 
-			  new FogNode("127.0.0.1", tcpPort, udpPort, interval, maxResponseTime, c, tempFogNodeList); 
+			  InetAddress inetAddress = InetAddress.getLocalHost();
+			  new FogNode(inetAddress.getHostAddress(), tcpPort, udpPort, interval, maxResponseTime, c, tempFogNodeList); 
 		  } else {
 			  System.out.println("Improper arguments passed!"); 
 		  }

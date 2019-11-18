@@ -14,7 +14,7 @@ Below are the steps to execute the project:
 3. Compile the java files
     {dc05:~/fog-computing} mkdir classes
     {dc05:~/fog-computing}  javac -d classes src/com/utd/acn/project/*.java 
-4. Run the nodes(fog, IoT,cloud) by passing relevant arguments
+4. Run the nodes(fog, IoT,cloud) by passing relevant arguments as given below.
     {dc05:~/fog-computing} cd classes/
     CloudNode:
     {dc05:~/fog-computing/classes} java com/utd/acn/project/CloudNode MY_TCP

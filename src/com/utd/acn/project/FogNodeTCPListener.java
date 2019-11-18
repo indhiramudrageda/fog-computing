@@ -18,7 +18,7 @@ public class FogNodeTCPListener extends Thread{
     	try {
 			tcpServersocket = new ServerSocket(fogNode.getTcpPort());
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Error creating server socket: "+ e.getMessage());
 		}
 	}
 
@@ -28,10 +28,10 @@ public class FogNodeTCPListener extends Thread{
         while (true)  
         { 
             try { 
-            	// receive updates from neighboring fog nodes. 
+            	// receive updates or requests from neighboring fog nodes.
             	socket = tcpServersocket.accept();
             	inStream = socket.getInputStream();
-        		objectInputStream = new ObjectInputStream(inStream);
+        		objectInputStream = new ObjectInputStream(inStream); 
                 Object obj = objectInputStream.readObject();
                 if(obj instanceof FogNodeUpdatePacket) {
 					FogNodeUpdatePacket updatePacket = (FogNodeUpdatePacket) obj;
@@ -41,14 +41,13 @@ public class FogNodeTCPListener extends Thread{
 					fogNode.processRequest(request);
 				}
             } catch (IOException | ClassNotFoundException e) { 
-            	// closing resources TO-DO: Finally
-                try {
+            	System.out.println("Error reading the request/update packet at fog node:" + fogNode.getIpAddress()); 
+            	try {
 					inStream.close();
 					socket.close();
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					System.out.println("Error closing connections: "+ e.getMessage());
 				} 
-                e.printStackTrace(); 
             } 
         }           
     } 

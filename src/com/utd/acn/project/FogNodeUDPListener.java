@@ -16,7 +16,7 @@ public class FogNodeUDPListener extends Thread {
 		try {
 			udpSocket =  new DatagramSocket(fogNode.getUdpPort());
 		} catch (SocketException e) {
-			e.printStackTrace();
+			System.out.println("Error creating server socket: "+ e.getMessage());
 		}
 	}
 
@@ -37,7 +37,7 @@ public class FogNodeUDPListener extends Thread {
                 fogNode.processRequest(requestObj);
             } catch (IOException | ClassNotFoundException e) { 
             	udpSocket.close(); 
-                e.printStackTrace(); 
+            	System.out.println("Error reading the request at fog node:" + fogNode.getIpAddress()); 
             } 
         }           
     } 

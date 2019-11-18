@@ -54,7 +54,7 @@ public class Node {
 				os.close();
 				s.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Error sending data: "+ e.getMessage());
 			}
 		} else if(protocol.equalsIgnoreCase("UDP")) {
 			try{
@@ -69,7 +69,7 @@ public class Node {
 				os.close();
 				socket.close();
 			}catch(Exception e){
-				System.out.println(e);
+				System.out.println("Error sending data: "+ e.getMessage());
 			}
 		}
 	}

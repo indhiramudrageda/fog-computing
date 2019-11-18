@@ -32,8 +32,7 @@ public class CloudNodeRequestHandler  extends Thread{
         } 
         catch (Exception e) 
         { 
-            // Throwing an exception 
-            System.out.println ("Exception is caught"); 
+        	System.out.println("Error processing the request at cloud node:" + cloudNode.getIpAddress()); 
         } 
     } 
 }

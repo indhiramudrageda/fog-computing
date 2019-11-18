@@ -18,7 +18,7 @@ public class CloudNodeListener extends Thread{
     	try {
 			this.tcpServersocket = new ServerSocket(cloudNode.getTcpPort());
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Error creating server socket: "+ e.getMessage());
 		}
 	}
 
@@ -35,14 +35,13 @@ public class CloudNodeListener extends Thread{
                 Request request = (Request)objectInputStream.readObject();
                 cloudNode.processRequest(request);
             } catch (IOException | ClassNotFoundException e) { 
-            	// closing resources TO-DO: Finally
+            	System.out.println("Error reading the request/update packet at fog node:" + cloudNode.getIpAddress()); 
                 try {
 					inStream.close();
 					socket.close();
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					System.out.println("Error closing connections: "+ e.getMessage());
 				} 
-                e.printStackTrace(); 
             } 
         }           
     } 

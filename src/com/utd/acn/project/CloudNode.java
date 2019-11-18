@@ -52,18 +52,19 @@ public class CloudNode extends Node{
 		this.processingQueue = processingQueue;
 	}
 
-	public static void main(String args[]) throws UnknownHostException {
+	public static void main(String args[]) {
 		//java CloudNode MY_TCP
 		//java CloudNode 127.0.0.1 5331
 		
-		int tcpPort;
-		if(args.length > 0) {
-			tcpPort = Integer.parseInt(args[0]);
+		try {
+			int tcpPort = Integer.parseInt(args[0]);
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			CloudNode c = new CloudNode(inetAddress.getHostAddress(), tcpPort, 0);
 			c.intitializeListeners();
-		} else {
-			System.out.println("Improper arguments passed!");
+		} catch (UnknownHostException uhe) {
+			  System.out.println("Host unknown");
+		} catch(Exception e) {
+			System.out.println("Improper arguments passed! Expected input format: MY_TCP");
 		}
 	}
 }

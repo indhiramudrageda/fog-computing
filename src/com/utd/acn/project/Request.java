@@ -27,4 +27,8 @@ public class Request implements Serializable{
 	public void appendAuditTrail(String auditTrail) {
 		this.auditTrail = this.auditTrail + "\n" + auditTrail;
 	}
+	public void decrementForwardingLt() {
+		int currForwardingLt = getHeader().getForwardingLimit();
+		getHeader().setForwardingLimit(currForwardingLt-1);
+	}
 }

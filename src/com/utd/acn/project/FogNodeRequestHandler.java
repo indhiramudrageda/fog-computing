@@ -32,8 +32,7 @@ public class FogNodeRequestHandler extends Thread{
         } 
         catch (Exception e) 
         { 
-            // Throwing an exception 
-            System.out.println ("Exception is caught"); 
+        	System.out.println("Error processing the request at fog node:" + fogNode.getIpAddress());
         } 
     } 
 }

@@ -34,14 +34,8 @@ public class IoTNode extends Node{
 	private Request prepareRequest() {
 		int randomIndex = getRandomIntegerBetweenRange(0, neighborFogNodes.size()-1);
 		FogNode destinationNode = getNeighborFogNodes().get(randomIndex);
-		int seqNum = getSequenceNum();
-		if(seqNum == Integer.MAX_VALUE)
-			seqNum = 0;
-		else 
-			seqNum++;
-		setSequenceNum(seqNum);
 		RequestHeader header = new RequestHeader(getIpAddress(), getUdpPort(),getIpAddress(), getUdpPort(), destinationNode.getIpAddress(), destinationNode.getUdpPort(), 
-				"UDP", seqNum, getRandomIntegerBetweenRange(2,5), getRandomIntegerBetweenRange(3,7));
+				"UDP", getNextSequenceNum(), getRandomIntegerBetweenRange(2,5), 30);
 		Request request = new Request(header, "["+header.getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ":"+ getUdpPort()+": Request has been generated and being sent to "+destinationNode.getIpAddress()+": "+destinationNode.getUdpPort());
 		return request;
 	}
@@ -62,26 +56,28 @@ public class IoTNode extends Node{
 		System.out.println();
 	}
 	
-	public static void main(String args[]) throws UnknownHostException {
+	public static void main(String args[]) {
 		//java IoTNode interval MY_UDP IP1 UDP1 IP2 UDP2
 		//String cmd = "3 9882 127.0.0.1 9876 127.0.0.1 9879";
 		//args = cmd.split(" ");
 		
 		int interval;
 		int udpPort;
-		if(args.length > 0) {
-			interval = Integer.parseInt(args[0]);
-			udpPort = Integer.parseInt(args[1]);
-			ArrayList<FogNode> tempFogNodeList = new ArrayList<FogNode>();
-			for(int i=2; i<args.length;i++) {
-				FogNode n = new FogNode(args[i], 0, Integer.parseInt(args[++i]));
-				tempFogNodeList.add(n);
+			try {
+				interval = Integer.parseInt(args[0]);
+				udpPort = Integer.parseInt(args[1]);
+				ArrayList<FogNode> tempFogNodeList = new ArrayList<FogNode>();
+				for (int i = 2; i < args.length; i++) {
+					FogNode n = new FogNode(args[i], 0, Integer.parseInt(args[++i]));
+					tempFogNodeList.add(n);
+				}
+				InetAddress inetAddress = InetAddress.getLocalHost();
+				new IoTNode(inetAddress.getHostAddress(), 0, udpPort, interval, tempFogNodeList);
+			} catch (UnknownHostException uhe) {
+				  System.out.println("Host unknown");
+			} catch (Exception e) {
+				System.out.println("Improper arguments passed! Expected input format: interval MY_UDP IP1 UDP1 IP2 UDP2");
 			}
-			InetAddress inetAddress = InetAddress.getLocalHost();
-			new IoTNode(inetAddress.getHostAddress(), 0, udpPort, interval, tempFogNodeList);
-		} else {
-			System.out.println("Improper arguments passed!");
-		}
 	}
 	
 	public static int getRandomIntegerBetweenRange(double min, double max){
@@ -112,7 +108,14 @@ public class IoTNode extends Node{
 	public int getSequenceNum() {
 		return sequenceNum;
 	}
-
+	
+	public int getNextSequenceNum() {
+		if(sequenceNum == Integer.MAX_VALUE)
+			sequenceNum = 0;
+		else 
+			sequenceNum++;
+		return sequenceNum;
+	}
 	public void setSequenceNum(int sequenceNum) {
 		this.sequenceNum = sequenceNum;
 	}

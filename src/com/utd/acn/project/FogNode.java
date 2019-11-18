@@ -57,8 +57,7 @@ public class FogNode extends Node {
 
 	protected void processRequest(Request request) {
 		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress() + ":"+getUdpPort()+": Request has been received.");
-		int currForwardingLt = request.getHeader().getForwardingLimit();
-		request.getHeader().setForwardingLimit(currForwardingLt-1);
+		request.decrementForwardingLt();
 		int expectedDelay = request.getHeader().getProcessingTime();
 		Iterator<Request> itr = getProcessingQueue().iterator();
 		while (itr.hasNext()) 
@@ -124,10 +123,8 @@ public class FogNode extends Node {
 		for(FogNode neighbor : getNeighborFogNodes()) {
 			if(request.getHeader().getComingFromIP() != neighbor.getIpAddress() 
 					&& request.getHeader().getComingFromPort()!= neighbor.getTcpPort()) {
-				if(minDelayNeighbor == null)
+				if(minDelayNeighbor == null || minDelayNeighbor.getCurrExpectedDelay() > neighbor.getCurrExpectedDelay())
 					minDelayNeighbor = neighbor;
-				else if(minDelayNeighbor.getCurrExpectedDelay() > neighbor.getCurrExpectedDelay())
-						minDelayNeighbor = neighbor;
 			}
 		}
 		return minDelayNeighbor;
@@ -146,7 +143,7 @@ public class FogNode extends Node {
 		send(response, response.getHeader().getSourceIP(), response.getHeader().getSourcePort(), "UDP");
 	}
 	
-	public static void main(String args[]) throws UnknownHostException {
+	public static void main(String args[]){
 		//java Max_Response_Time t MY_TCP MY_UDP C TCP0 N1 TCP1 N2 TCP2
 		//String TCP1 = "4 3 5325 9876 127.0.0.1 5331 127.0.0.1 5326 127.0.0.1 5328";
 		//String TCP2 = "4 3 5326 9877 127.0.0.1 5331 127.0.0.1 5325 127.0.0.1 5327 127.0.0.1 5328";
@@ -160,23 +157,25 @@ public class FogNode extends Node {
 		  int interval; 
 		  int tcpPort;
 		  int udpPort; 
-		  if(args.length > 0) 
-		  { 
-			  maxResponseTime = Integer.parseInt(args[0]); 
-			  interval = Integer.parseInt(args[1]); 
-			  tcpPort = Integer.parseInt(args[2]); 
-			  udpPort = Integer.parseInt(args[3]); 
+		  try {
+			  maxResponseTime = Integer.parseInt(args[0]);
+			  interval = Integer.parseInt(args[1]);
+			  tcpPort = Integer.parseInt(args[2]);
+			  udpPort = Integer.parseInt(args[3]);
 			  CloudNode c = new CloudNode(args[4], Integer.parseInt(args[5]), 0);
-			  ArrayList<FogNode> tempFogNodeList = new ArrayList<FogNode>(); 
-			  for(int i=6; i<args.length;i++) { 
-				  FogNode n = new FogNode(args[i], Integer.parseInt(args[++i]), 0); 
-				  tempFogNodeList.add(n); 
-			  } 
+			  ArrayList<FogNode> tempFogNodeList = new ArrayList<FogNode>();
+			  for (int i = 6; i < args.length; i++) {
+				  FogNode n = new FogNode(args[i], Integer.parseInt(args[++i]), 0);
+				  tempFogNodeList.add(n);
+			  }
 			  InetAddress inetAddress = InetAddress.getLocalHost();
-			  new FogNode(inetAddress.getHostAddress(), tcpPort, udpPort, interval, maxResponseTime, c, tempFogNodeList); 
-		  } else {
-			  System.out.println("Improper arguments passed!"); 
-		  }
+			  new FogNode(inetAddress.getHostAddress(), tcpPort, udpPort, interval, maxResponseTime, c,
+					  tempFogNodeList);
+		  } catch (UnknownHostException uhe) {
+			  System.out.println("Host unknown");
+		  } catch (Exception e) {
+			  System.out.println("Improper arguments passed! Expected input format: Max_Response_Time t MY_TCP MY_UDP C TCP0 N1 TCP1 N2 TCP2");
+		  } 
 	}
 	
 	public int getMaxResponseTime() {

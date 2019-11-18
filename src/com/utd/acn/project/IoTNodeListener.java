@@ -16,7 +16,7 @@ public class IoTNodeListener extends Thread {
 		try {
 			udpSocket =  new DatagramSocket(iotNode.getUdpPort());
 		} catch (SocketException e) {
-			e.printStackTrace();
+			System.out.println("Error creating server socket: "+ e.getMessage());
 		}
 	}
 
@@ -37,7 +37,7 @@ public class IoTNodeListener extends Thread {
                 iotNode.printResponse(responseObj);
             } catch (IOException | ClassNotFoundException e) { 
             	this.udpSocket.close(); 
-                e.printStackTrace(); 
+                System.out.println("Error reading the response at IOT node: "+ iotNode.getIpAddress());
             } 
         }           
     } 

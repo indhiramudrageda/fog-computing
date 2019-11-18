@@ -35,7 +35,7 @@ public class CloudNodeListener extends Thread{
                 Request request = (Request)objectInputStream.readObject();
                 cloudNode.processRequest(request);
             } catch (IOException | ClassNotFoundException e) { 
-            	System.out.println("Error reading the request/update packet at fog node:" + cloudNode.getIpAddress()); 
+            	System.out.println("Error reading the request at cloud node:" + cloudNode.getIpAddress()); 
                 try {
 					inStream.close();
 					socket.close();

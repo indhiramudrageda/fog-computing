@@ -20,7 +20,7 @@ public class CloudNodeRequestHandler  extends Thread{
         	  while(itr.hasNext()) {
         		  Request request = (Request) itr.next();
         		  //sleep
-        		  Thread.sleep((long) request.getHeader().getProcessingTime());
+        		  Thread.sleep((long) request.getHeader().getProcessingTime()*1000);
       			  //remove from queue
         		  cloudNode.getProcessingQueue().remove(request);
       			  //append audit

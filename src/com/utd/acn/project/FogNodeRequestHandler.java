@@ -20,7 +20,7 @@ public class FogNodeRequestHandler extends Thread{
         	  while(itr.hasNext()) {
         		  Request request = (Request) itr.next();
         		  //sleep
-        		  Thread.sleep((long) request.getHeader().getProcessingTime());
+        		  Thread.sleep((long) request.getHeader().getProcessingTime()*1000);
       			  //remove from queue
         		  fogNode.getProcessingQueue().remove(request);
       			  //append audit

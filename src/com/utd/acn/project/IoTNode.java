@@ -35,7 +35,7 @@ public class IoTNode extends Node{
 		int randomIndex = getRandomIntegerBetweenRange(0, neighborFogNodes.size()-1);
 		FogNode destinationNode = getNeighborFogNodes().get(randomIndex);
 		RequestHeader header = new RequestHeader(getIpAddress(), getUdpPort(),getIpAddress(), getUdpPort(), destinationNode.getIpAddress(), destinationNode.getUdpPort(), 
-				"UDP", getNextSequenceNum(), getRandomIntegerBetweenRange(2,5), 30);
+				"UDP", getNextSequenceNum(), getRandomIntegerBetweenRange(2,5), getRandomIntegerBetweenRange(3,7));
 		Request request = new Request(header, "["+header.getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ":"+ getUdpPort()+": Request has been generated and being sent to "+destinationNode.getIpAddress()+": "+destinationNode.getUdpPort());
 		return request;
 	}

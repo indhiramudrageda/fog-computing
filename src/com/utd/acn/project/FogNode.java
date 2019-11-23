@@ -54,7 +54,10 @@ public class FogNode extends Node {
 		FogNodeTCPListener tcpListener = new FogNodeTCPListener(this);
 		tcpListener.start();
 	}
-
+	
+	/*
+	 * Method to process the request received.
+	 * */
 	protected void processRequest(Request request) {
 		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress() + ":"+getUdpPort()+": Request has been received.");
 		request.decrementForwardingLt();
@@ -76,8 +79,12 @@ public class FogNode extends Node {
 		}
 	}
 	
+	/*
+	 * Method to forward the request to a neighboring fog node.
+	 * */
 	private void forwardRequest(Request request) {
 		FogNode bestNode = getBestNeighbor(request);
+		//forward to cloud if no best neighbor found
 		if(bestNode == null)
 			forwardRequestToCloud(request);
 		else {
@@ -89,6 +96,9 @@ public class FogNode extends Node {
 		
 	}
 	
+	/*
+	 * Method to forward the request to cloud
+	 * */
 	private void forwardRequestToCloud(Request request) {
 		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+  getIpAddress() + ":"+ getTcpPort()+": Forwarding request to cloud node "+  getCloudNode().getIpAddress()+":"+ getCloudNode().getTcpPort());
 		request.getHeader().setComingFromIP(getIpAddress());
@@ -96,6 +106,9 @@ public class FogNode extends Node {
 		send(request, getCloudNode().getIpAddress(),getCloudNode().getTcpPort(), "TCP");
 	}
 	
+	/*
+	 * Method to send updates to neighboring fog nodes about the current processing delay
+	 * */
 	protected void updateNeighbors() {
 		int currExpectedDelay = 0;
 		for(Request req : getProcessingQueue()) {
@@ -109,15 +122,23 @@ public class FogNode extends Node {
 		}
 	}
 	
+	/*
+	 * Method to update the current processing delay of a neighboring fog node that has sent the update
+	 * */
 	protected void storeNeighborsInfo(FogNodeUpdatePacket updatePacket) {
 		for(FogNode neighbor : getNeighborFogNodes()) { 
 			if(neighbor.getIpAddress().equals(updatePacket.getHeader().getSourceIP())) {
-				neighbor.setCurrExpectedDelay(updatePacket.getCurrExpectedDelay());
+				synchronized(neighbor) {
+					neighbor.setCurrExpectedDelay(updatePacket.getCurrExpectedDelay());
+				}
 				return;
 			}
 		}
 	}
 	
+	/*
+	 * Method to find the neighbor with least processing delay and the one that hasn't forwarded the request to current node.
+	 * */
 	private FogNode getBestNeighbor(Request request) {
 		FogNode minDelayNeighbor = null;
 		for(FogNode neighbor : getNeighborFogNodes()) {
@@ -144,15 +165,6 @@ public class FogNode extends Node {
 	}
 	
 	public static void main(String args[]){
-		//java Max_Response_Time t MY_TCP MY_UDP C TCP0 N1 TCP1 N2 TCP2
-		//String TCP1 = "4 3 5325 9876 127.0.0.1 5331 127.0.0.1 5326 127.0.0.1 5328";
-		//String TCP2 = "4 3 5326 9877 127.0.0.1 5331 127.0.0.1 5325 127.0.0.1 5327 127.0.0.1 5328";
-		//String TCP3 = "4 3 5327 9878 127.0.0.1 5331 127.0.0.1 5326 127.0.0.1 5329 127.0.0.1 5330";
-		//String TCP4 = "4 3 5328 9879 127.0.0.1 5331 127.0.0.1 5325 127.0.0.1 5326 127.0.0.1 5329";
-		//String TCP5 = "4 3 5329 9880 127.0.0.1 5331 127.0.0.1 5327 127.0.0.1 5328 127.0.0.1 5330";
-		//String TCP6 = "4 3 5330 9881 127.0.0.1 5331 127.0.0.1 5327 127.0.0.1 5329";
-		
-		//args = cmd.split(" ");
 		  int maxResponseTime; 
 		  int interval; 
 		  int tcpPort;

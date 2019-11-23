@@ -53,9 +53,6 @@ public class CloudNode extends Node{
 	}
 
 	public static void main(String args[]) {
-		//java CloudNode MY_TCP
-		//java CloudNode 127.0.0.1 5331
-		
 		try {
 			int tcpPort = Integer.parseInt(args[0]);
 			InetAddress inetAddress = InetAddress.getLocalHost();

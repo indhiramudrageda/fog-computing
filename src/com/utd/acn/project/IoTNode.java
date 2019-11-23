@@ -31,6 +31,9 @@ public class IoTNode extends Node{
 		super(ipAddress, tcpPort, udpPort);
 	}
 	
+	/*
+	 * Method to prepare the request
+	 * */
 	private Request prepareRequest() {
 		int randomIndex = getRandomIntegerBetweenRange(0, neighborFogNodes.size()-1);
 		FogNode destinationNode = getNeighborFogNodes().get(randomIndex);
@@ -57,10 +60,6 @@ public class IoTNode extends Node{
 	}
 	
 	public static void main(String args[]) {
-		//java IoTNode interval MY_UDP IP1 UDP1 IP2 UDP2
-		//String cmd = "3 9882 127.0.0.1 9876 127.0.0.1 9879";
-		//args = cmd.split(" ");
-		
 		int interval;
 		int udpPort;
 			try {
@@ -81,8 +80,8 @@ public class IoTNode extends Node{
 	}
 	
 	public static int getRandomIntegerBetweenRange(double min, double max){
-	    double x = (int)(Math.random()*((max-min)+1))+min;
-	    return (int) x;
+	    double random = (int)(Math.random()*((max-min)+1))+min;
+	    return (int) random;
 	}
 	
 	public ArrayList<FogNode> getNeighborFogNodes() {

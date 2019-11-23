@@ -24,7 +24,7 @@ public class CloudNodeRequestHandler  extends Thread{
       			  //remove from queue
         		  cloudNode.getProcessingQueue().remove(request);
       			  //append audit
-        		  cloudNode.appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]CLOUD NODE:"+ cloudNode.getIpAddress()+ ":"+cloudNode.getTcpPort()+": Processing completed.");
+        		  cloudNode.appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]CLOUD NODE:"+ cloudNode.getIpAddress()+ ": Processing completed.");
       			  //send response
       			  cloudNode.sendResponse(request);
         	  }

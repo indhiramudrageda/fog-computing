@@ -39,7 +39,7 @@ public class IoTNode extends Node{
 		FogNode destinationNode = getNeighborFogNodes().get(randomIndex);
 		RequestHeader header = new RequestHeader(getIpAddress(), getUdpPort(),getIpAddress(), getUdpPort(), destinationNode.getIpAddress(), destinationNode.getUdpPort(), 
 				"UDP", getNextSequenceNum(), getRandomIntegerBetweenRange(2,5), getRandomIntegerBetweenRange(3,7));
-		Request request = new Request(header, "["+header.getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ":"+ getUdpPort()+": Request has been generated and being sent to "+destinationNode.getIpAddress()+": "+destinationNode.getUdpPort());
+		Request request = new Request(header, "["+header.getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ": Request has been generated and being sent to "+destinationNode.getIpAddress());
 		return request;
 	}
 	
@@ -54,7 +54,7 @@ public class IoTNode extends Node{
 	}
 
 	protected void printResponse(Response response) {
-		response.appendAuditTrail("["+response.getHeader().getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ":"+ getUdpPort()+": Response has been received.");
+		response.appendAuditTrail("["+response.getHeader().getSequenceNumber()+"]IoT NODE:"+ getIpAddress()+ ": Response has been received.");
 		System.out.println(response.getAuditTrail());
 		System.out.println();
 	}

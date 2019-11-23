@@ -59,7 +59,7 @@ public class FogNode extends Node {
 	 * Method to process the request received.
 	 * */
 	protected void processRequest(Request request) {
-		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress() + ":"+getUdpPort()+": Request has been received.");
+		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress() + ": Request has been received.");
 		request.decrementForwardingLt();
 		int expectedDelay = request.getHeader().getProcessingTime();
 		Iterator<Request> itr = getProcessingQueue().iterator();
@@ -88,7 +88,7 @@ public class FogNode extends Node {
 		if(bestNode == null)
 			forwardRequestToCloud(request);
 		else {
-			appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress() + ":"+ getTcpPort()+": Forwarding request to neighboring fog node :"+ bestNode.getIpAddress()+":"+bestNode.getTcpPort());
+			appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress() + ": Forwarding request to neighboring fog node :"+ bestNode.getIpAddress());
 			request.getHeader().setComingFromIP(getIpAddress());
 			request.getHeader().setComingFromPort(getTcpPort());
 			send(request, bestNode.getIpAddress(), bestNode.getTcpPort(), "TCP");
@@ -100,7 +100,7 @@ public class FogNode extends Node {
 	 * Method to forward the request to cloud
 	 * */
 	private void forwardRequestToCloud(Request request) {
-		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+  getIpAddress() + ":"+ getTcpPort()+": Forwarding request to cloud node "+  getCloudNode().getIpAddress()+":"+ getCloudNode().getTcpPort());
+		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+  getIpAddress() + ": Forwarding request to cloud node "+  getCloudNode().getIpAddress());
 		request.getHeader().setComingFromIP(getIpAddress());
 		request.getHeader().setComingFromPort(getTcpPort());
 		send(request, getCloudNode().getIpAddress(),getCloudNode().getTcpPort(), "TCP");
@@ -151,8 +151,11 @@ public class FogNode extends Node {
 		return minDelayNeighbor;
 	}
 	
+	/*
+	 * Method to prepare request object.
+	 * */
 	private Response prepareResponse(Request request) {
-		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress()+ ":"+getUdpPort()+": Response is being generated and sent to source "+ request.getHeader().getSourceIP()+": "+request.getHeader().getSourcePort());
+		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ getIpAddress()+ ": Response is being generated and sent to source "+ request.getHeader().getSourceIP());
 		ResponseHeader header = new ResponseHeader(request.getHeader().getSourceIP(), request.getHeader().getSourcePort(), 
 				request.getHeader().getDestinationIP(), request.getHeader().getDestinationPort(), "UDP", request.getHeader().getSequenceNumber());
 		Response response = new Response(header, request.getAuditTrail());

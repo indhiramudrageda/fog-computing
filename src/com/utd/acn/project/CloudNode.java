@@ -27,12 +27,12 @@ public class CloudNode extends Node{
 	}
 	
 	protected void processRequest(Request request) {
-		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]CLOUD NODE:"+ getIpAddress() + ":"+ getTcpPort()+": Request has been received.");	
+		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]CLOUD NODE:"+ getIpAddress() +": Request has been received.");	
 		getProcessingQueue().add(request);
 	}
 	
 	private Response prepareResponse(Request request) {
-		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]CLOUD NODE:"+ getIpAddress()+ ":"+ getTcpPort()+": Response is being generated and sent to source "+ request.getHeader().getSourceIP()+": "+request.getHeader().getSourcePort());
+		appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]CLOUD NODE:"+ getIpAddress()+": Response is being generated and sent to source "+ request.getHeader().getSourceIP());
 		ResponseHeader header = new ResponseHeader(request.getHeader().getSourceIP(), request.getHeader().getSourcePort(), 
 				request.getHeader().getDestinationIP(), request.getHeader().getDestinationPort(), "UDP", request.getHeader().getSequenceNumber());
 		Response response = new Response(header, request.getAuditTrail());

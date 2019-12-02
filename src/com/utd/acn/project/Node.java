@@ -54,7 +54,7 @@ public class Node {
 				os.close();
 				s.close();
 			} catch (IOException e) {
-				System.out.println("Error sending data to: "+destIP+ e.getMessage());
+				System.out.println("Error sending data to "+destIP+": "+ e.getMessage());
 			}
 		} else if(protocol.equalsIgnoreCase("UDP")) {
 			try{
@@ -69,7 +69,7 @@ public class Node {
 				oos.close();
 				socket.close();
 			}catch(Exception e){
-				System.out.println("Error sending data to: "+destIP+ e.getMessage());
+				System.out.println("Error sending data to "+destIP+": "+ e.getMessage());
 			}
 		}
 	}

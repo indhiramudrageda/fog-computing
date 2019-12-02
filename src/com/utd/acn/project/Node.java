@@ -39,11 +39,11 @@ public class Node {
 		this.tcpPort = tcpPort;
 	}
 	
-	public void appendAuditInfo(Request request, String audit) {
+	public static void appendAuditInfo(Request request, String audit) {
 		request.appendAuditTrail(audit);
 	}
 	
-	public void send(Object object, String destIP, int destPort, String protocol) {
+	public static void send(Object object, String destIP, int destPort, String protocol) {
 		if(protocol.equalsIgnoreCase("TCP")) {
 			try {
 				Socket s = new Socket(destIP, destPort);
@@ -54,22 +54,22 @@ public class Node {
 				os.close();
 				s.close();
 			} catch (IOException e) {
-				System.out.println("Error sending data: "+ e.getMessage());
+				System.out.println("Error sending data to: "+destIP+ e.getMessage());
 			}
 		} else if(protocol.equalsIgnoreCase("UDP")) {
 			try{
 				DatagramSocket socket = new DatagramSocket();
 				InetAddress IPAddress = InetAddress.getByName(destIP);
-				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-				ObjectOutputStream os = new ObjectOutputStream(outputStream);
-				os.writeObject(object);
-				byte[] data = outputStream.toByteArray();
+				ByteArrayOutputStream os = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(os);
+				oos.writeObject(object);
+				byte[] data = os.toByteArray();
 				DatagramPacket sendPacket = new DatagramPacket(data, data.length, IPAddress, destPort);
 				socket.send(sendPacket);
-				os.close();
+				oos.close();
 				socket.close();
 			}catch(Exception e){
-				System.out.println("Error sending data: "+ e.getMessage());
+				System.out.println("Error sending data to: "+destIP+ e.getMessage());
 			}
 		}
 	}

@@ -24,7 +24,7 @@ public class FogNodeRequestHandler extends Thread{
       			  //remove from queue
         		  fogNode.getProcessingQueue().remove(request);
       			  //append audit
-        		  fogNode.appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ fogNode.getIpAddress()+ ": Processing completed.");
+        		  Node.appendAuditInfo(request, "["+request.getHeader().getSequenceNumber()+"]FOG NODE:"+ fogNode.getIpAddress()+ ": Processing completed.");
       			  //send response
       			  fogNode.sendResponse(request);
         	  }
